@@ -5,7 +5,7 @@ type Status struct {
 }
 
 type Sensores struct {
-	Calidad_aire int
-	Temperatura  float64
-	Humedad      float64
+	Air_quality int
+	Temperature  float64
+	Humidity      float64
 }

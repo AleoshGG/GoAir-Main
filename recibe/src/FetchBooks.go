@@ -1,6 +1,6 @@
 package src
 
-/* import (
+import (
 	"bytes"
 	"encoding/json"
 	"log"
@@ -8,13 +8,13 @@ package src
 	"recibed/entities"
 )
 
-func FetchAPI(loan entities.Loan, method string) {
+func FetchAPI(metrics entities.Sensores) {
 	// Construir la URL de la petición PATCH
-	URL := "http://54.159.73.69/books/" + method 
-	jsonBody, _ := json.Marshal(loan)
+	URL := "http://localhost:8080/sensors/"  
+	jsonBody, _ := json.Marshal(metrics)
 
 	// Crear la petición PATCH con el body JSON
-	req, err := http.NewRequest(http.MethodPatch, URL, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequest(http.MethodPost, URL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		log.Fatalf("Error creando la petición PATCH: %v", err)
 	}
@@ -34,4 +34,4 @@ func FetchAPI(loan entities.Loan, method string) {
 	} else {
 		log.Println("Libro actualizado correctamente mediante PATCH")
 	}
-} */
+}
