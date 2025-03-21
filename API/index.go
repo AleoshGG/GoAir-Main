@@ -11,11 +11,11 @@ import (
 
 func main() {
 	godotenv.Load()
-	conn.Connection()
+	conn.Migration()
+
+
 	infrastructure.GoDependences()
-
 	r := gin.Default()
-
 	routes.RegisterRouter(r)
 	r.Run()
 }
