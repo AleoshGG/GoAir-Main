@@ -28,6 +28,20 @@ CREATE TABLE IF NOT EXISTS sensors_readings (
     FOREIGN KEY (id_sensor) REFERENCES sensors(id_sensor) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS users (
+    id_user     SERIAL PRIMARY KEY,
+    first_name  VARCHAR(50) NOT NULL,
+    last_name   VARCHAR(50) NOT NULL,
+    email       VARCHAR(50) NOT NULL UNIQUE,
+    password    VARCHAR(200) NOT NULL
+);
 
+CREATE TABLE IF NOT EXISTS users_places (
+    id_place INT,
+    id_user INT,
+    PRIMARY KEY (id_place, id_user),
+    FOREIGN KEY (id_place) REFERENCES places(id_place) ON DELETE CASCADE,
+    FOREIGN KEY (id_user) REFERENCES users(id_user) ON DELETE CASCADE
+);
 
 

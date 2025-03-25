@@ -2,3 +2,5 @@ DROP TABLE IF EXISTS sensors_readings;
 DROP TABLE IF EXISTS sensors;
 DROP TABLE IF EXISTS places;
 DROP TYPE IF EXISTS sensor_type_enum CASCADE;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS users_places;
