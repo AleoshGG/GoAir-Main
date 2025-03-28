@@ -9,6 +9,7 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres" // Importa driver de PostgreSQL
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/lib/pq"
 )
 
 type ConnPostgreSQL struct {
@@ -77,4 +78,8 @@ func Migration() {
 	}
 
 	fmt.Println("Migraciones aplicadas correctamente")
+}
+
+func (conn *ConnPostgreSQL) QueryRowScan(query string, dest ...interface{}) error {
+	return conn.DB.QueryRow(query).Scan(dest...)
 }
