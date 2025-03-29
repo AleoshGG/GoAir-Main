@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres" // Importa driver de PostgreSQL
@@ -63,9 +65,14 @@ func (conn *ConnPostgreSQL) FetchRows(query string, values ...interface{}) (*sql
 }
 
 func Migration() {
+	// Obtener ruta absoluta del directorio de migraciones
+    absPath, _ := filepath.Abs("./database/migrations")
+    
+    // Convertir barras invertidas a barras normales y agregar 3 barras iniciales
+    normalizedPath := "file://" + strings.ReplaceAll(absPath, "\\", "/")
 
 	m, err := migrate.New(
-		"file://./database/migrations",
+		normalizedPath,
 		os.Getenv("URL_POSTGRES"),
 	)
 	if err != nil {

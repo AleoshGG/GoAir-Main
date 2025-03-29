@@ -4,6 +4,12 @@ EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;
 
+DO $$ BEGIN
+    CREATE TYPE status_application_enum AS ENUM ('requested', 'pending', 'complete');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
 CREATE TABLE IF NOT EXISTS users (
     id_user     SERIAL PRIMARY KEY,
     first_name  VARCHAR(50) NOT NULL,
@@ -17,7 +23,7 @@ CREATE TABLE IF NOT EXISTS places (
     id_user     INT,
     name        VARCHAR(45) NOT NULL,
     create_at   TIMESTAMP DEFAULT now(), 
-    FOREIGN KEY (id_user) REFERENCES users(id_user)
+    FOREIGN KEY (id_user) REFERENCES users(id_user) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS sensors (
@@ -27,7 +33,7 @@ CREATE TABLE IF NOT EXISTS sensors (
     model               VARCHAR(10) NOT NULL,
     installation_date   TIMESTAMP DEFAULT now(),
     PRIMARY KEY (id_sensor, sensor_type),
-    FOREIGN KEY (id_place) REFERENCES places(id_place) ON DELETE SET NULL
+    FOREIGN KEY (id_place) REFERENCES places(id_place) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS sensors_readings (
@@ -39,8 +45,22 @@ CREATE TABLE IF NOT EXISTS sensors_readings (
     FOREIGN KEY (id_sensor, sensor_type) REFERENCES sensors(id_sensor, sensor_type) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS devices (
+    id_device   VARCHAR(100),
+    id_place    INT NOT NULL,
+    PRIMARY KEY (id_device),
+    FOREIGN KEY (id_place) REFERENCES places(id_place) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS applications (
+    id_application SERIAL PRIMARY KEY,
+    status_application status_application_enum NOT NULL,
+    id_user     INT,
+    FOREIGN KEY (id_user) REFERENCES users(id_user) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS admin (
-    password VARCHAR(50),
+    password VARCHAR(200) NOT NULL,
     email    VARCHAR(50),
     PRIMARY KEY (email)
 );

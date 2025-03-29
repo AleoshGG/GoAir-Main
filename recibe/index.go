@@ -26,7 +26,7 @@ func main() {
             log.Printf("Error al decodificar el mensaje: %s", err)
             continue
         }
-        log.Printf(" [x] Recibido: Calidad del aire: %d%%, Temperatura: %.1f°C, Humedad: %.1f%%", status.Sensores.Air_quality, status.Sensores.Temperature, status.Sensores.Humidity)
+        log.Printf(" [x] Recibido: Calidad del aire: %d%%, Temperatura: %.1f°C, Humedad: %.1f%%, Dispositivo: %d", status.Sensores.Air_quality, status.Sensores.Temperature, status.Sensores.Humidity, status.Sensores.Id_device)
         src.FetchAPI(status.Sensores)
     }
 }()
