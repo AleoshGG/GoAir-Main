@@ -10,5 +10,6 @@ func RegisterRouter(r *gin.Engine) {
 	sensorsRoutes := r.Group("/sensors")
 	{
 		sensorsRoutes.POST("/", controllers.NewRegisterMetricsController().RegisterMetrics)
+		sensorsRoutes.GET("/:id", controllers.NewGetMetrics().GetMetrics)
 	}
 }

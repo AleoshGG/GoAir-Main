@@ -2,5 +2,8 @@ package domain
 
 type ISensors interface {
 	RegisterReadings(reading Readings) (uint, error)
-	GetMetrics(id_sensor string, sensor_type string) []Readings
+	GetAirQualityAVG(id_place int) []AirQuialityAVG
+	GetAirQualityLast24(id_place int) []AirQuialityLast24
+	GetTemperatureLast24(id_place int) []TemperatureLast24
+	GetHumidityLast24(id_place int) []HumidityLast24
 }
