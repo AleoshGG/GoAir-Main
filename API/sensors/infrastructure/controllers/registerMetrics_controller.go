@@ -5,7 +5,9 @@ import (
 	usecases "API/sensors/application/useCases"
 	"API/sensors/domain"
 	"API/sensors/infrastructure"
+	"log"
 	"net/http"
+	"sync/atomic"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,11 +25,10 @@ func NewRegisterMetricsController() *RegisterMetricsController {
 	return &RegisterMetricsController{service: service, app: app}
 }
 
-var count int = 1
+var count int32 = 1
 
 func (rm_c *RegisterMetricsController) RegisterMetrics(c *gin.Context) {
 	var metrics domain.Sensor
-	var newReading domain.Readings
 
 	if err := c.ShouldBindJSON(&metrics); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -38,52 +39,53 @@ func (rm_c *RegisterMetricsController) RegisterMetrics(c *gin.Context) {
 	}
 
 	rm_c.service.Run(metrics)
-	count++
+	current := atomic.AddInt32(&count, 1)
 
-	if count == 20 {
-		//Creando insert para la base de datos
-		newReading.Id_sensor = metrics.Id_sensor[0]
-		newReading.Sensor_type = "air_quality"
-		newReading.Value = float64(metrics.Air_quality)
+	if current == 20 {
+        // Copiar datos necesarios para la goroutine
+        data := struct {
+            IDs      []string
+            Air      int
+            Temp     float64
+            Humidity float64
+        }{
+            IDs:      metrics.Id_sensor,
+            Air:      metrics.Air_quality,
+            Temp:     metrics.Temperature,
+            Humidity: metrics.Humidity,
+        }
 
-		if _, err := rm_c.app.Run(newReading); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status": false,
-				"error": "Ocurrió un error al insertar en la base de datos en el sensor air_quality: " + err.Error(),
-			})
-			return
-		}
+        go func(d struct { IDs []string; Air int; Temp, Humidity float64 }) {
+            // Insertar air_quality
+            if _, err := rm_c.app.Run(domain.Readings{
+                Id_sensor:   d.IDs[0],
+                Sensor_type: "air_quality",
+                Value:       float64(d.Air),
+            }); err != nil {
+                log.Printf("Error insertando air_quality: %v", err) // <- Usar logging
+            }
 
-		newReading.Id_sensor = metrics.Id_sensor[1]
-		newReading.Sensor_type = "temperature"
-		newReading.Value = float64(metrics.Temperature)
+            // Insertar temperature
+            if _, err := rm_c.app.Run(domain.Readings{
+                Id_sensor:   d.IDs[1],
+                Sensor_type: "temperature",
+                Value:       float64(d.Temp),
+            }); err != nil {
+                log.Printf("Error insertando temperature: %v", err)
+            }
 
-		if _, err := rm_c.app.Run(newReading); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status": false,
-				"error": "Ocurrió un error al insertar en la base de datos en el sensor temperature: " + err.Error(),
-			})
-			return
-		}
+            // Insertar humidity
+            if _, err := rm_c.app.Run(domain.Readings{
+                Id_sensor:   d.IDs[2],
+                Sensor_type: "humidity",
+                Value:       float64(d.Humidity),
+            }); err != nil {
+                log.Printf("Error insertando humidity: %v", err)
+            }
 
-		newReading.Id_sensor = metrics.Id_sensor[2]
-		newReading.Sensor_type = "humidity"
-		newReading.Value = float64(metrics.Humidity)
-
-		if _, err := rm_c.app.Run(newReading); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"status": false,
-				"error": "Ocurrió un error al insertar en la base de datos en el sensor humidity: " + err.Error(),
-			})
-			return
-		}
-
-		c.JSON(http.StatusCreated, gin.H{
-			"status": true,
-			"count": count,
-		})
-		count = 0
-	}	
+            atomic.StoreInt32(&count, 0) // Reset después de inserts
+        }(data)
+    }
 
 	c.JSON(http.StatusCreated, gin.H{
 		"status": true,

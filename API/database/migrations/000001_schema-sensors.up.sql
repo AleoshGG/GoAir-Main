@@ -5,7 +5,7 @@ EXCEPTION
 END $$;
 
 DO $$ BEGIN
-    CREATE TYPE status_application_enum AS ENUM ('requested', 'pending', 'complete');
+    CREATE TYPE status_application_enum AS ENUM ('requested', 'pending');
 EXCEPTION
     WHEN duplicate_object THEN null;
 END $$;

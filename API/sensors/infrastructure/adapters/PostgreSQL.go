@@ -22,13 +22,14 @@ func NewPostgreSQL() *PostgreSQL {
 
 func (postgre *PostgreSQL) RegisterReadings(reading domain.Readings) (uint, error) {
 	query := "INSERT INTO sensors_readings (id_sensor, sensor_type, value) VALUES ($1,$2,$3)"
-
-	_, err := postgre.conn.DB.Query(query, reading.Id_sensor, reading.Sensor_type, reading.Value)
+	
+	
+	res, err := postgre.conn.DB.Query(query, reading.Id_sensor, reading.Sensor_type, reading.Value)
 	if err != nil {
 		fmt.Println("Error al ejecutar la consulta 1: %v", err)
 		return 0, err
 	}
-
+	defer res.Close()
 	return 1, nil
 } 
 
