@@ -5,6 +5,7 @@ import (
 	"API/sensors/infrastructure"
 	"API/sensors/infrastructure/routes"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -12,10 +13,12 @@ import (
 func main() {
 	godotenv.Load()
 	conn.Migration()
-
+	
 
 	infrastructure.GoDependences()
 	r := gin.Default()
+	r.Use(cors.Default())
+	
 	routes.RegisterRouter(r)
 	r.Run()
 }
