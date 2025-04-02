@@ -11,4 +11,5 @@ type Sensores struct {
 	Humidity    float64
 	Id_device   string
 	Ventilador  string
+	Id_place    int
 }
