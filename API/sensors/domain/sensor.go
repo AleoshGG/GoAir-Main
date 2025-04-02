@@ -1,4 +1,5 @@
 package domain
+
 type Sensor struct {
 	Id_sensor   []string
 	Air_quality int
@@ -6,4 +7,5 @@ type Sensor struct {
 	Humidity    float64
 	Id_device   string
 	Ventilador  string
+	Id_place    int
 }
